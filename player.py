@@ -2,19 +2,21 @@ class Player:
 
     remianing_words = []
     allowed = ''
+    words = []
 
     @staticmethod
     def start_game(words, allowed):
-        Player.remianing_words = words
-
+        Player.words = words[:]
         Player.allowed = allowed
 
     @staticmethod
-    def next_word(length):
+    def next_word(length, allowed):
         def filter_word_length(word):
             return len(word) == length
+
         Player.remianing_words = list(
-            filter(filter_word_length, Player.remianing_words))
+            filter(filter_word_length, Player.words))
+        Player.allowed = allowed
 
     @staticmethod
     def guess_letter(pattern, previous_guesses):
@@ -43,27 +45,38 @@ class Player:
                 Player.remianing_words = list(filter(lambda word: not(letter in word),
                                                      Player.remianing_words))
 
-        def guessing_algorithm():
+        def guessing_based_on_frequency_algorithm():
             freq = {}
-
-            max_freq_letter = ''
+            Player.allowed = ''.join(
+                list(filter(lambda x: x not in previous_guesses, Player.allowed)))
 
             for letter in Player.allowed:
-                if not (letter in previous_guesses):
-                    freq[letter] = 0
-                    max_freq_letter = letter
+                freq[letter] = 0
 
             for word in Player.remianing_words:
                 for letter in word:
                     if not (letter in previous_guesses):
                         freq[letter] += 1
 
-            max_freq_val = freq[max_freq_letter]
-            for letter, freq_val in freq.items():
-                if freq_val > max_freq_val:
-                    max_freq_letter = letter
-                    max_freq_val = freq_val
-            return max_freq_letter
+            max_letter = Player.allowed[0]
+            max_val = freq[Player.allowed[0]]
+
+            for letter, f_val in freq.items():
+                if f_val > max_val:
+                    max_val = f_val
+                    max_letter = letter
+
+            if max_val == 0:
+                print('\nval: ', max_val, 'letter:', max_letter)
+                print('previous guesses', previous_guesses)
+                print('words:', len(Player.remianing_words))
+            return max_letter
+
+        def naive_alphabetical_guess():
+            for letter in Player.allowed:
+                if not (letter in previous_guesses):
+                    return letter
 
         # print(f'\nfiltered: {orig_len-len(Player.remianing_words)}, {len(Player.remianing_words)} left')
-        return guessing_algorithm()
+        return guessing_based_on_frequency_algorithm()
+        # return naive_alphabetical_guess()
