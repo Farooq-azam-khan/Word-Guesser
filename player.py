@@ -1,3 +1,6 @@
+import math
+
+
 class Player:
 
     remianing_words = []
@@ -45,7 +48,7 @@ class Player:
                 Player.remianing_words = list(filter(lambda word: not(letter in word),
                                                      Player.remianing_words))
 
-        def guessing_based_on_frequency_algorithm():
+        def get_letter_frequency():
             freq = {}
             Player.allowed = ''.join(
                 list(filter(lambda x: x not in previous_guesses, Player.allowed)))
@@ -57,6 +60,10 @@ class Player:
                 for letter in word:
                     if not (letter in previous_guesses):
                         freq[letter] += 1
+            return freq
+
+        def guessing_based_on_frequency_algorithm():
+            freq = get_letter_frequency()
 
             max_letter = Player.allowed[0]
             max_val = freq[Player.allowed[0]]
@@ -65,11 +72,6 @@ class Player:
                 if f_val > max_val:
                     max_val = f_val
                     max_letter = letter
-
-            if max_val == 0:
-                print('\nval: ', max_val, 'letter:', max_letter)
-                print('previous guesses', previous_guesses)
-                print('words:', len(Player.remianing_words))
             return max_letter
 
         def naive_alphabetical_guess():
@@ -77,6 +79,34 @@ class Player:
                 if not (letter in previous_guesses):
                     return letter
 
-        # print(f'\nfiltered: {orig_len-len(Player.remianing_words)}, {len(Player.remianing_words)} left')
+        def use_entropy():
+            freq = get_letter_frequency()
+            n = len(Player.remianing_words)
+            # print(freq)
+            # entropy = -1*sum([(val/n)*math.log2(val/n) for _, val in freq.items()])
+            entropy = 0
+            for _, val in freq.items():
+                if (val/n) == 0:
+                    entropy += (val/n)*math.log(abs(0.00001))
+                else:
+                    entropy += (val/n)*math.log(abs(val/n))
+            entropy *= -1
+
+            bitGain = {}
+            for l, p in freq.items():
+                bitGain[l] = ((-1*entropy)/(10-(p/n)*10/10)) * \
+                    (p/n)*10/10*(p/n)*10/10
+
+            max_letter = Player.allowed[0]
+            max_val = bitGain[Player.allowed[0]]
+
+            for letter, f_val in bitGain.items():
+                if f_val < max_val:
+                    max_val = f_val
+                    max_letter = letter
+            return max_letter
+
+            # print(f'\nfiltered: {orig_len-len(Player.remianing_words)}, {len(Player.remianing_words)} left')
         return guessing_based_on_frequency_algorithm()
+        # return use_entropy() # not fully developed
         # return naive_alphabetical_guess()
