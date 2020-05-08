@@ -1,5 +1,10 @@
 from player import Player
 import random
+import sys
+
+import logging
+
+log = logging.getLogger(__name__)
 
 
 def get_words(filename='words.txt'):
@@ -10,13 +15,13 @@ def get_words(filename='words.txt'):
     return words
 
 
-def main():
+def main(verbose, seed, rounds):
     # constants
-    ROUNDS = 100000
-    SEED = 100
+    ROUNDS = rounds
+    SEED = seed
+    VERBOSE = verbose
     random.seed(SEED)
 
-    VERBOSE = False
     if VERBOSE:
         print('verbose mode is on')
 
@@ -34,15 +39,15 @@ def main():
     if VERBOSE:
         print(f'Using seed {SEED}')
 
+    total_misses = 0
     for _ in range(ROUNDS):
         current_misses = 0
-        total_misses = 0
         previous_guesses = ''
         secret_word = random.choice(words)
         previous_correct = -1
         if VERBOSE:
             print(f'Secret Word: {secret_word}: ', end='')
-        Player.next_word(len(secret_word))
+        Player.next_word(len(secret_word), ALLOWED)
 
         while current_misses < len(ALLOWED):
             pattern = ''
@@ -74,7 +79,10 @@ def main():
         total_misses += current_misses
         if VERBOSE:
             print(f' ({current_misses})')
-    print(f'made total {total_misses} misses over {ROUNDS} rounds.')
+    print(
+        f'Made a total of {total_misses} misses over {ROUNDS} rounds with seed {SEED}.')
+    # logging.log(level='log'
+    #             msg=f'Made a total of {total_misses} misses over {ROUNDS} rounds with seed {SEED}.')
 
 
 def filter_characters(word, allowed_chars):
@@ -85,4 +93,15 @@ def filter_characters(word, allowed_chars):
 
 
 if __name__ == '__main__':
-    main()
+
+    if len(sys.argv) != 4:
+        print('python runner.py [seed] [rounds] [verbose(true/false)]')
+    else:
+        VERBOSE = False
+        if (sys.argv[3] == 'true' or sys.argv[3] == 'True'):
+            VERBOSE = True
+
+        ROUNDS = int(sys.argv[2])
+        SEED = int(sys.argv[1])
+
+        main(verbose=VERBOSE, rounds=ROUNDS, seed=SEED)
