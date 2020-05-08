@@ -34,27 +34,16 @@ public class SnowmanPlayer
 		// clear the HashSet and arrays from previous word
 		hs_words.clear();
 		found.clear();
-		for (int i=0; i<26; i++){freq[i] = 0;}
+		clear_frequency();
 
 		for (String clone_word: clone_words) {
 			// add the words that have same length as secret word
-			if (clone_word.length() == length) {hs_words.add(clone_word); continue;}
+			if (clone_word.length() == length) {hs_words.add(clone_word);}
 		} 			
 	}
 	
-	public static void count_repetition_in_pattern(int[] letter_repetition_pattern, String pattern) {
-		for (int i=0; i<pattern.length(); i++)
-		{
-			if (pattern.charAt(i) != '*')
-			{
-				int pat_rep_char = (int) (pattern.charAt(i)) - 97; 
-				letter_repetition_pattern[pat_rep_char]++; 
-			}
-		}
-	}
 	
-	public static void clear_frequency() { for (int i=0; i<26; i++) { freq[i] = 0; } }
-
+	
 	/*
 	* @params pattern: shows a string of correct guessedLetters and the not yet guessed letters
 	* @params previousGuesses: shows a string of the guesses that have been made
@@ -80,10 +69,11 @@ public class SnowmanPlayer
 		Iterator<String> it = hs_words.iterator(); 
 		while(it.hasNext())
 		{
-			String word = it.next(); // word that needs analyzing
-			int word_len = word.length(); // length of that word
+			String word = it.next(); 
+			int word_len = word.length(); 
 
-			int[] letter_repetition_word = new int[26]; // counter for occurences of characters in word
+			// counter for occurences of characters in word (TODO: factor out)
+			int[] letter_repetition_word = new int[26]; 
 			for (int i=0; i<word_len; i++)
 			{
 				int word_rep_char = (int) (word.charAt(i)) - 97; 
@@ -279,6 +269,21 @@ public class SnowmanPlayer
 			}	
 		}
 		return max_char; 
+	}
+	
+	
+	public static void clear_frequency() { for (int i=0; i<26; i++) { freq[i] = 0; } }
+
+	
+	public static void count_repetition_in_pattern(int[] letter_repetition_pattern, String pattern) {
+		for (int i=0; i<pattern.length(); i++)
+		{
+			if (pattern.charAt(i) != '*')
+			{
+				int pat_rep_char = (int) (pattern.charAt(i)) - 97; 
+				letter_repetition_pattern[pat_rep_char]++; 
+			}
+		}
 	}
 
 }
