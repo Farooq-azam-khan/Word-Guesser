@@ -1,23 +1,3 @@
-/*
-* SnowmanPlayer is a class that plays the game Snowman.
-* The Algorithm is described as follows: 
-	* 0. clear frequency
-	* 1. wrong letter guess -> remove all words with that letter
-	* 2. right letter guess -> check for pattern
-	* 3. pattern doesn't match -> remove word from Set
-	* 4. pattern match -> check for occurence of letter
-	* 5. word doesn't have same occurence -> remove word
-	* 6. word has same occurence -> get frequency
-		* (repeating letters in word will have a frequency of 1) ^ (letters that dont appear in wordlist get freq of zero) 
-		* ^ (previous guessed letters get frequency of zero)
-	* 7. guess the letter based on max frequency
-	* 8. if the size of wordlist is 1 then return the non guessed letters (ie. wherever you see a "*" a letter for that will be guessed)
-
-* Faroq A. Khan
-* @version 1.0
-* November 24th 2017
-*/
-
 import java.util.*;
 
 public class SnowmanPlayer
@@ -56,16 +36,24 @@ public class SnowmanPlayer
 		found.clear();
 		for (int i=0; i<26; i++){freq[i] = 0;}
 
-		int clone_words_len = clone_words.length; // lenght of words array
-		for (int i=0; i<clone_words_len; i++) // iterate over list of possible words
-		{
-			String clone_word = clone_words[i]; 
-			int clone_word_len = clone_word.length(); 
-
+		for (String clone_word: clone_words) {
 			// add the words that have same length as secret word
-			if (clone_word_len == length) {hs_words.add(clone_word); continue;}
+			if (clone_word.length() == length) {hs_words.add(clone_word); continue;}
 		} 			
-	}	
+	}
+	
+	public static void count_repetition_in_pattern(int[] letter_repetition_pattern, String pattern) {
+		for (int i=0; i<pattern.length(); i++)
+		{
+			if (pattern.charAt(i) != '*')
+			{
+				int pat_rep_char = (int) (pattern.charAt(i)) - 97; 
+				letter_repetition_pattern[pat_rep_char]++; 
+			}
+		}
+	}
+	
+	public static void clear_frequency() { for (int i=0; i<26; i++) { freq[i] = 0; } }
 
 	/*
 	* @params pattern: shows a string of correct guessedLetters and the not yet guessed letters
@@ -76,23 +64,16 @@ public class SnowmanPlayer
 	{
 
 		// clear frequency at start of each guess
-		for (int i=0; i<26; i++) {freq[i]=0;}
-		
+		clear_frequency(); 
 		// -----------------------------------------------------------------------------------------
 		// ------------------------- check patter for repeated characters --------------------------
 		// -----------------------------------------------------------------------------------------
 
 		// counter for occurences of characters in pattern
 		int[] letter_repetition_pattern = new int[26]; 
+		count_repetition_in_pattern(letter_repetition_pattern, pattern);
 		
-		for (int i=0; i<pattern.length(); i++)
-		{
-			if (pattern.charAt(i) != '*')
-			{
-				int pat_rep_char = (int) (pattern.charAt(i)) - 97; 
-				letter_repetition_pattern[pat_rep_char]++; 
-			}
-		}
+		
 		// -----------------------------------------------------------------------------------------
 		// ------------------------- check for repeated characters in words ------------------------
 		// -----------------------------------------------------------------------------------------
